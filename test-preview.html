@@ -1,0 +1,183 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Test Preview</title>
+    <style>
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+
+        body, html {
+            height: 100%;
+            font-family: Arial, sans-serif;
+        }
+
+        /* Sidebar styling */
+        .sidebar {
+            width: 250px;
+            background-color: #f4f4f4;
+            padding: 15px;
+            position: fixed;
+            top: 0;
+            left: 0;
+            height: 100%;
+            transition: transform 0.3s ease;
+            z-index: 1;
+            overflow-y: auto;
+            padding-top: 80px; /* Space below the hamburger menu */
+        }
+
+        .sidebar ul {
+            list-style-type: none;
+            padding: 0;
+        }
+
+        .sidebar ul li {
+            margin: 15px 0;
+        }
+
+        .sidebar ul li a {
+            text-decoration: none;
+            color: #333;
+            font-size: 16px;
+            cursor: pointer;
+        }
+
+        /* Highlight the selected item */
+        .sidebar ul li a.active {
+            color: #007BFF;
+            font-weight: bold;
+        }
+
+        .sidebar ul li a:hover {
+            color: #007BFF;
+        }
+
+        /* Main content area */
+        .content {
+            margin-left: 250px;
+            height: 100%;
+            transition: margin-left 0.3s ease;
+        }
+
+        iframe {
+            width: 100%;
+            height: 100%;
+            border: none;
+        }
+
+        /* Hamburger Menu Styling */
+        .hamburger {
+            position: fixed;
+            top: 15px;
+            left: 15px;
+            background-color: transparent;
+            border: none;
+            cursor: pointer;
+            z-index: 2;
+        }
+
+        .hamburger svg {
+            width: 30px;
+            height: 30px;
+            fill: none;
+        }
+
+        /* Hidden Sidebar Styling */
+        .sidebar-hidden {
+            transform: translateX(-250px);
+        }
+
+        .content-expanded {
+            margin-left: 0;
+        }
+
+        /* Mobile-friendly styling */
+        @media (max-width: 768px) {
+            .sidebar {
+                width: 100%;
+                transform: translateX(-100%);
+            }
+
+            .content {
+                margin-left: 0;
+            }
+
+            .sidebar-hidden {
+                transform: translateX(-100%);
+            }
+
+            .content-expanded {
+                margin-left: 0;
+            }
+        }
+
+    </style>
+
+    <script>
+        function toggleSidebar() {
+            const sidebar = document.querySelector('.sidebar');
+            const content = document.querySelector('.content');
+            sidebar.classList.toggle('sidebar-hidden');
+            content.classList.toggle('content-expanded');
+        }
+
+        function changeIframeSource(link, element) {
+            // Change the iframe source
+            document.getElementById("iframe-content").src = link;
+
+            // Remove 'active' class from all sidebar links
+            const links = document.querySelectorAll('.sidebar ul li a');
+            links.forEach(link => {
+                link.classList.remove('active');
+            });
+
+            // Add 'active' class to the clicked link
+            element.classList.add('active');
+        }
+    </script>
+</head>
+<body>
+
+    <!-- Hamburger button with SVG icon -->
+    <button class="hamburger" onclick="toggleSidebar()">
+        <svg width="800px" height="800px" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+            <path d="M4 18L20 18" stroke="#000000" stroke-width="2" stroke-linecap="round"/>
+            <path d="M4 12L20 12" stroke="#000000" stroke-width="2" stroke-linecap="round"/>
+            <path d="M4 6L20 6" stroke="#000000" stroke-width="2" stroke-linecap="round"/>
+        </svg>
+    </button>
+
+    <!-- Sidebar -->
+    <div class="sidebar sidebar-hidden">
+        <ul>
+            <li><strong>Coding Assessment</strong></li>
+            <li><a href="#" onclick="changeIframeSource('https://app.testgorilla.com/preview/443820c2-1a69-43fc-bc84-68a99b1ae428?language=en', this)" class="active">Sample 1</a></li>
+            <li><a href="#" onclick="changeIframeSource('https://app.testgorilla.com/preview/1769911?language=en', this)">Sample 2</a></li>
+
+            <li><strong>Software Programming</strong></li>
+            <li><a href="#" onclick="changeIframeSource('https://app.testgorilla.com/preview/a8e660f4-f6e6-4bb1-90f6-a27f6babc019?language=en', this)">Sample 1</a></li>
+            <li><a href="#" onclick="changeIframeSource('https://app.testgorilla.com/preview/91a4ac4a-2181-4e10-86b5-7959e7978114?language=en', this)">Sample 2</a></li>
+            <li><a href="#" onclick="changeIframeSource('https://app.testgorilla.com/preview/233f6f61-a1c7-4606-9f3e-61483a68f288?language=en', this)">Sample 3</a></li>
+            <li><a href="#" onclick="changeIframeSource('https://app.testgorilla.com/preview/3cdb2b54-4112-40d3-895c-27c96676e101?language=en', this)">Sample 4</a></li>
+            
+            <li><strong>Critical Thinking</strong></li>
+            <li><a href="#" onclick="changeIframeSource('https://app.testgorilla.com/preview/8a97dc04-e827-4034-b355-5afef1db38c6?language=en', this)">Sample 1</a></li>
+            <li><a href="#" onclick="changeIframeSource('https://app.testgorilla.com/preview/4dceffa9-bdd2-4d62-bc2f-3dbdb8ac54d0?language=en', this)">Sample 2</a></li>
+            <li><a href="#" onclick="changeIframeSource('https://app.testgorilla.com/preview/41fcdad8-35e0-48f3-9895-aaf0704e2604?language=en', this)">Sample 3</a></li>
+            <li><a href="#" onclick="changeIframeSource('https://app.testgorilla.com/preview/8abf79b1-dbfe-4cd8-b5ad-56787f979c30?language=en', this)">Sample 4</a></li>
+            <li><a href="#" onclick="changeIframeSource('https://app.testgorilla.com/preview/0b1cc465-d314-492a-a60f-8e9032466b19?language=en', this)">Sample 5</a></li>
+        </ul>
+    </div>
+
+    <!-- Main Content -->
+    <div class="content content-expanded">
+        <iframe id="iframe-content" src="https://app.testgorilla.com/preview/443820c2-1a69-43fc-bc84-68a99b1ae428?language=en"></iframe>
+    </div>
+
+</body>
+</html>

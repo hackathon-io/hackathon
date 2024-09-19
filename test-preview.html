@@ -116,6 +116,53 @@
             }
         }
 
+        /* Rules styling */
+        /* Rules Container Styling */
+        .rules-container {
+            position: fixed; /* Ensure it stays in place */
+            top: 50%; /* Center vertically */
+            left: 50%; /* Center horizontally */
+            transform: translate(-50%, -50%); /* Center based on its own size */
+            padding: 20px;
+            max-width: 800px;
+            width: 90%; /* Adjust width to fit within viewport */
+            background-color: #fff;
+            border: 1px solid #ddd;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+            text-align: left;
+            font-size: 16px;
+            line-height: 1.5;
+            z-index: 2; /* Ensure it appears above other content */
+        }
+
+        .rules-container h2 {
+            margin-bottom: 20px;
+            color: #333;
+        }
+
+        .rules-container ul {
+            margin-bottom: 20px;
+        }
+
+        .rules-container li {
+            margin: 10px 0;
+        }
+
+        .rules-container button {
+            display: block;
+            margin: 0 auto;
+            padding: 10px 20px;
+            background-color: #007BFF;
+            color: #fff;
+            border: none;
+            cursor: pointer;
+            font-size: 16px;
+            border-radius: 5px;
+        }
+
+        .rules-container button:hover {
+            background-color: #0056b3;
+        }
     </style>
 
     <script>
@@ -139,6 +186,12 @@
             // Add 'active' class to the clicked link
             element.classList.add('active');
         }
+
+        function acceptRules() {
+            // Redirect to Coding Assessment Sample 1
+            document.querySelector('.rules-container').style.display = 'none';
+            document.getElementById("iframe-content").src = 'https://app.testgorilla.com/preview/443820c2-1a69-43fc-bc84-68a99b1ae428?language=en';
+        }
     </script>
 </head>
 <body>
@@ -156,7 +209,7 @@
     <div class="sidebar sidebar-hidden">
         <ul>
             <li><strong>Coding Assessment</strong></li>
-            <li><a href="#" onclick="changeIframeSource('https://app.testgorilla.com/preview/443820c2-1a69-43fc-bc84-68a99b1ae428?language=en', this)" class="active">Sample 1</a></li>
+            <li><a href="#" onclick="changeIframeSource('https://app.testgorilla.com/preview/443820c2-1a69-43fc-bc84-68a99b1ae428?language=en', this)">Sample 1</a></li>
             <li><a href="#" onclick="changeIframeSource('https://app.testgorilla.com/preview/1769911?language=en', this)">Sample 2</a></li>
 
             <li><strong>Software Programming</strong></li>
@@ -174,9 +227,21 @@
         </ul>
     </div>
 
+    <!-- Rules Container -->
+    <div class="rules-container">
+        <h2>Hackathon Participation Rules</h2>
+        <ul>
+            <li><strong>Devices:</strong> Participants must use a computer. Use of mobile phones and tablets is not permitted.</li>
+            <li><strong>Focus:</strong> Participants must not leave the test screen during the assessment. External browsing or switching applications is strictly prohibited.</li>
+            <li><strong>Webcam Permissions:</strong> Webcam access must be granted, and participants should remain visible on the camera throughout the assessment.</li>
+            <li><strong>Monitoring:</strong> Participants must ensure that they are always visible in the webcam feed. Any suspicious behavior or absence from the camera may result in disqualification.</li>
+        </ul>
+        <button onclick="acceptRules()">Accept and Continue</button>
+    </div>
+
     <!-- Main Content -->
     <div class="content content-expanded">
-        <iframe id="iframe-content" src="https://app.testgorilla.com/preview/443820c2-1a69-43fc-bc84-68a99b1ae428?language=en"></iframe>
+        <iframe id="iframe-content" src="#"></iframe>
     </div>
 
 </body>

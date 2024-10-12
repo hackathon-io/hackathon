@@ -71,9 +71,10 @@
             <h5 class="card-title">Device Compatibility Check</h5>
             <ul id="card" class="list-unstyled"></ul>
 
-            <form id="dataForm" method="POST" action="/" style="display: none;">
+            <form id="dataForm" style="display: none;">
                 <input type="hidden" id="formData" name="formData" />
                 <div class="d-flex justify-content-center">
+                    <p class="alert alert-danger" id="dataform-error-message">Make Sure all the issue above are fixed to access Assessments</p>
                     <button type="submit" class="btn btn-primary" id="continueButton" hidden>Continue</button>
                 </div>
             </form>
@@ -210,6 +211,9 @@
                 var allTrue = Object.values(statusChecks).every(status => status === true);
                 var $continueButton = $("#continueButton");
                 $continueButton.prop('hidden', !allTrue);
+                if(allTrue){
+                    document.getElementById("dataform-error-message").remove();
+                }
             }
 
             var $continueButton = $("#continueButton");

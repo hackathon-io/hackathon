@@ -71,10 +71,11 @@
             <h5 class="card-title">Device Compatibility Check</h5>
             <ul id="card" class="list-unstyled"></ul>
 
-            <form id="dataForm" style="display: none;">
+            <form id="dataForm">
                 <input type="hidden" id="formData" name="formData" />
                 <div class="d-flex justify-content-center">
-                    <p class="alert alert-danger" id="dataform-error-message">Make Sure all the issue above are fixed to access Assessments</p>
+                    <p class="alert alert-danger" id="dataform-error-message">Make Sure all the issue above are fixed to <br>
+                        access Assessments Or try updating your browser</p>
                     <button type="submit" class="btn btn-primary" id="continueButton" hidden>Continue</button>
                 </div>
             </form>
@@ -97,93 +98,88 @@
             // Check if the user is on a mobile or tablet device
             var isMobile = /Mobi|Android|iPad|Tablet/.test(userAgent);
 
-            if (isMobile) {
-                $("#card").html('<li class="alert alert-danger">This assessment is only available on desktop.</li>');
-            } else {
-                $("#dataForm").show();
-
-                // Detect Browser
-                var browser = "Unknown Browser";
-                if (userAgent.indexOf("Chrome") != -1 && userAgent.indexOf("Edge") == -1 && userAgent.indexOf("OPR") == -1) {
-                    browser = "Google Chrome";
-                } else if (userAgent.indexOf("Safari") != -1 && userAgent.indexOf("Chrome") == -1) {
-                    browser = "Safari";
-                } else if (userAgent.indexOf("Firefox") != -1) {
-                    browser = "Mozilla Firefox";
-                } else if (userAgent.indexOf("MSIE") != -1 || userAgent.indexOf("Trident") != -1) {
-                    browser = "Internet Explorer";
-                } else if (userAgent.indexOf("Edge") != -1) {
-                    browser = "Microsoft Edge";
-                } else if (userAgent.indexOf("OPR") != -1) {
-                    browser = "Opera";
-                }
-
-                statusChecks.browser = true;
-                updateStatus("Browser", browser, true);
-                
-                // Browser Online Status
-                statusChecks.browserOnline = navigator.onLine;
-                updateStatus("Browser Online", navigator.onLine, true);
-
-                // Cookies Enabled
-                statusChecks.cookiesEnabled = navigator.cookieEnabled;
-                updateStatus("Cookies Enabled", navigator.cookieEnabled, navigator.cookieEnabled);
-
-                // Webcam Check
-                addLoadingStatus("Checking Webcam Access...");
-                navigator.mediaDevices.getUserMedia({ video: true })
-                    .then(function (stream) {
-                        statusChecks.webcam = true;
-                        updateStatus("Webcam Enabled", true);
-                        stream.getTracks().forEach(track => track.stop());
-                    })
-                    .catch(function () {
-                        statusChecks.webcam = false;
-                        updateStatus("Webcam Enabled", false, false);
-                    })
-                    .finally(function () {
-                        $("#card li:contains('Checking Webcam Access...')").remove();
-                    });
-
-                // Geolocation Check
-                addLoadingStatus("Checking Geolocation...");
-                if (navigator.geolocation) {
-                    navigator.geolocation.getCurrentPosition(
-                        function (position) {
-                            var latitude = position.coords.latitude;
-                            var longitude = position.coords.longitude;
-                            statusChecks.location = true;                        
-                            updateStatus("Location", `Latitude: ${latitude}, Longitude: ${longitude}`, true);
-                            $("#card li:contains('Checking Geolocation...')").remove();
-                        },
-                        function () {
-                            statusChecks.location = false;
-                            updateStatus("Location", "Unable to retrieve location", false);
-                            $("#card li:contains('Checking Geolocation...')").remove();
-                        }
-                    );
-                } else {
-                    statusChecks.location = false;
-                    updateStatus("Location", "Geolocation is not supported by this browser.", false);
-                    $("#card li:contains('Checking Geolocation...')").remove();
-                }
-
-                // Fetch Public IP
-                addLoadingStatus("Fetching Public IP...");
-                fetch('https://api.ipify.org?format=json')
-                    .then(response => response.json())
-                    .then(data => {
-                        statusChecks.publicIP = true;
-                        updateStatus("Public IP", data.ip, true);
-                    })
-                    .catch(function () {
-                        statusChecks.publicIP = false;
-                        updateStatus("Public IP", "Unable to retrieve IP address", false);
-                    })
-                    .finally(function () {
-                        $("#card li:contains('Fetching Public IP...')").remove();
-                    });
+            // Detect Browser
+            var browser = "Unknown Browser";
+            if (userAgent.indexOf("Chrome") != -1 && userAgent.indexOf("Edge") == -1 && userAgent.indexOf("OPR") == -1) {
+                browser = "Google Chrome";
+            } else if (userAgent.indexOf("Safari") != -1 && userAgent.indexOf("Chrome") == -1) {
+                browser = "Safari";
+            } else if (userAgent.indexOf("Firefox") != -1) {
+                browser = "Mozilla Firefox";
+            } else if (userAgent.indexOf("MSIE") != -1 || userAgent.indexOf("Trident") != -1) {
+                browser = "Internet Explorer";
+            } else if (userAgent.indexOf("Edge") != -1) {
+                browser = "Microsoft Edge";
+            } else if (userAgent.indexOf("OPR") != -1) {
+                browser = "Opera";
             }
+
+            statusChecks.browser = !isMobile;
+            updateStatus("Browser", browser, !isMobile);
+            
+            // Browser Online Status
+            statusChecks.browserOnline = navigator.onLine;
+            updateStatus("Browser Online", navigator.onLine, true);
+
+            // Cookies Enabled
+            statusChecks.cookiesEnabled = navigator.cookieEnabled;
+            updateStatus("Cookies Enabled", navigator.cookieEnabled, navigator.cookieEnabled);
+
+            // Webcam Check
+            addLoadingStatus("Checking Webcam Access...");
+            navigator.mediaDevices.getUserMedia({ video: true })
+                .then(function (stream) {
+                    statusChecks.webcam = true;
+                    updateStatus("Webcam Enabled", true);
+                    stream.getTracks().forEach(track => track.stop());
+                })
+                .catch(function () {
+                    statusChecks.webcam = false;
+                    updateStatus("Webcam Enabled", false, false);
+                })
+                .finally(function () {
+                    $("#card li:contains('Checking Webcam Access...')").remove();
+                });
+
+            // Geolocation Check
+            addLoadingStatus("Checking Geolocation...");
+            if (navigator.geolocation) {
+                navigator.geolocation.getCurrentPosition(
+                    function (position) {
+                        var latitude = position.coords.latitude;
+                        var longitude = position.coords.longitude;
+                        statusChecks.location = true;                        
+                        updateStatus("Location", `Latitude: ${latitude}, Longitude: ${longitude}`, true);
+                        $("#card li:contains('Checking Geolocation...')").remove();
+                    },
+                    function () {
+                        statusChecks.location = false;
+                        updateStatus("Location", "Unable to retrieve location", false);
+                        $("#card li:contains('Checking Geolocation...')").remove();
+                    }
+                );
+            } else {
+                statusChecks.location = false;
+                updateStatus("Location", "Geolocation is not supported by this browser.", false);
+                $("#card li:contains('Checking Geolocation...')").remove();
+            }
+
+            // Fetch Public IP
+            addLoadingStatus("Fetching Public IP...");
+            fetch('https://api.ipify.org?format=json')
+                .then(response => response.json())
+                .then(data => {
+                    statusChecks.publicIP = true;
+                    updateStatus("Public IP", data.ip, true);
+                })
+                .catch(function () {
+                    statusChecks.publicIP = false;
+                    updateStatus("Public IP", "Unable to retrieve IP address", false);
+                })
+                .finally(function () {
+                    $("#card li:contains('Fetching Public IP...')").remove();
+                });
+            
 
             // Function to add loading status
             function addLoadingStatus(label) {
@@ -207,13 +203,14 @@
             }
 
             function checkAllStatuses() {
-                // Initially disable the button
                 var allTrue = Object.values(statusChecks).every(status => status === true);
-                var $continueButton = $("#continueButton");
-                $continueButton.prop('hidden', !allTrue);
-                if(allTrue){
+                if(isMobile){
+                    document.getElementById("dataform-error-message").innerHTML = "This assessment is only available on desktop.";
+                }else if(allTrue){
                     document.getElementById("dataform-error-message").remove();
                 }
+                var $continueButton = $("#continueButton");
+                $continueButton.prop('hidden', !allTrue);
             }
 
             var $continueButton = $("#continueButton");

@@ -1,0 +1,244 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Device Compatibility Check</title>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap/5.3.3/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-icons/1.11.3/font/bootstrap-icons.min.css" rel="stylesheet">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.7.1/jquery.slim.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/bootstrap/5.3.3/js/bootstrap.min.js"></script>
+    <style>
+        body {
+            background-color: #f8f9fa;
+            font-family: Arial, sans-serif;
+            height: 100vh;
+            margin: 0;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+        }
+
+        .card {
+            /* width: 22rem; */
+            border-radius: 15px;
+        }
+
+        .status-item {
+            display: flex;
+            align-items: center;
+            padding: 5px 0;
+            padding-left: 30px;
+        }
+
+        .status-item .icon {
+            margin-right: 10px;
+            font-size: 24px;
+        }
+
+        .status-item:hover {
+            background-color: #e9ecef;
+            border-radius: 5px;
+        }
+
+        .loading-icon {
+            margin-right: 10px;
+            color: #007bff;
+            animation: spin 3s linear infinite;
+        }
+
+        @keyframes spin {
+            0% {
+                transform: rotate(0deg);
+            }
+
+            100% {
+                transform: rotate(360deg);
+            }
+        }
+
+        .info-icon {
+            margin-left: 10px;
+            font-size: 18px;
+        }
+    </style>
+</head>
+
+<body class="bg-light">
+    <div id="card-container" class="card rounded-lg shadow" style="border-radius: 15px;">
+        <div class="card-body">
+            <h5 class="card-title">Device Compatibility Check</h5>
+            <ul id="card" class="list-unstyled"></ul>
+
+            <form id="dataForm" method="POST" action="/" style="display: none;">
+                <input type="hidden" id="formData" name="formData" />
+                <button type="submit" class="btn btn-primary" id="continueButton" hidden>Continue</button>
+            </form>
+        </div>
+    </div>
+
+    <script type="text/javascript">
+        $(document).ready(function () {
+            var statusChecks = {
+                browser: false,
+                browserOnline: false,
+                cookiesEnabled: false,
+                webcam: false,
+                location: false,
+                publicIP: false
+            };
+
+            var userAgent = navigator.userAgent;
+
+            // Check if the user is on a mobile or tablet device
+            var isMobile = /Mobi|Android|iPad|Tablet/.test(userAgent);
+
+            if (isMobile) {
+                $("#card").html('<li class="alert alert-danger">This assessment is only available on desktop.</li>');
+            } else {
+                $("#dataForm").show();
+
+                // Detect Browser
+                var browser = "Unknown Browser";
+                if (userAgent.indexOf("Chrome") != -1 && userAgent.indexOf("Edge") == -1 && userAgent.indexOf("OPR") == -1) {
+                    browser = "Google Chrome";
+                } else if (userAgent.indexOf("Safari") != -1 && userAgent.indexOf("Chrome") == -1) {
+                    browser = "Safari";
+                } else if (userAgent.indexOf("Firefox") != -1) {
+                    browser = "Mozilla Firefox";
+                } else if (userAgent.indexOf("MSIE") != -1 || userAgent.indexOf("Trident") != -1) {
+                    browser = "Internet Explorer";
+                } else if (userAgent.indexOf("Edge") != -1) {
+                    browser = "Microsoft Edge";
+                } else if (userAgent.indexOf("OPR") != -1) {
+                    browser = "Opera";
+                }
+
+                statusChecks.browser = true;
+                updateStatus("Browser", browser, true);
+                
+                // Browser Online Status
+                statusChecks.browserOnline = navigator.onLine;
+                updateStatus("Browser Online", navigator.onLine, true);
+
+                // Cookies Enabled
+                statusChecks.cookiesEnabled = navigator.cookieEnabled;
+                updateStatus("Cookies Enabled", navigator.cookieEnabled, navigator.cookieEnabled);
+
+                // Webcam Check
+                addLoadingStatus("Checking Webcam Access...");
+                navigator.mediaDevices.getUserMedia({ video: true })
+                    .then(function (stream) {
+                        statusChecks.webcam = true;
+                        updateStatus("Webcam Enabled", true);
+                        stream.getTracks().forEach(track => track.stop());
+                    })
+                    .catch(function () {
+                        statusChecks.webcam = false;
+                        updateStatus("Webcam Enabled", false, false);
+                    })
+                    .finally(function () {
+                        $("#card li:contains('Checking Webcam Access...')").remove();
+                    });
+
+                // Geolocation Check
+                addLoadingStatus("Checking Geolocation...");
+                if (navigator.geolocation) {
+                    navigator.geolocation.getCurrentPosition(
+                        function (position) {
+                            var latitude = position.coords.latitude;
+                            var longitude = position.coords.longitude;
+                            statusChecks.location = true;                        
+                            updateStatus("Location", `Latitude: ${latitude}, Longitude: ${longitude}`, true);
+                            $("#card li:contains('Checking Geolocation...')").remove();
+                        },
+                        function () {
+                            statusChecks.location = false;
+                            updateStatus("Location", "Unable to retrieve location", false);
+                            $("#card li:contains('Checking Geolocation...')").remove();
+                        }
+                    );
+                } else {
+                    statusChecks.location = false;
+                    updateStatus("Location", "Geolocation is not supported by this browser.", false);
+                    $("#card li:contains('Checking Geolocation...')").remove();
+                }
+
+                // Fetch Public IP
+                addLoadingStatus("Fetching Public IP...");
+                fetch('https://api.ipify.org?format=json')
+                    .then(response => response.json())
+                    .then(data => {
+                        statusChecks.publicIP = true;
+                        updateStatus("Public IP", data.ip, true);
+                    })
+                    .catch(function () {
+                        statusChecks.publicIP = false;
+                        updateStatus("Public IP", "Unable to retrieve IP address", false);
+                    })
+                    .finally(function () {
+                        $("#card li:contains('Fetching Public IP...')").remove();
+                    });
+            }
+
+            // Function to add loading status
+            function addLoadingStatus(label) {
+                var loadingIcon = `<i class="bi bi-arrow-clockwise loading-icon" style="font-size: 24px;"></i>`;
+                var statusHtml = `<li class="status-item">${loadingIcon} ${label}</li>`;
+                $("#card").append(statusHtml);
+            }
+
+            // Function to update status
+            function updateStatus(label, status, isSuccess = true) {
+                var iconHtml = isSuccess
+                    ? `<i class="bi bi-check-circle-fill icon text-success" data-toggle="tooltip" data-placement="right" title="Success"></i>`
+                    : `<i class="bi bi-x-circle-fill icon text-danger" data-toggle="tooltip" data-placement="right" title="Error"></i>`;
+
+                var infoColor = isSuccess ? 'text-success' : 'text-danger';
+                var infoIcon = `<i class="bi bi-info-circle-fill ${infoColor} info-icon" data-toggle="tooltip" data-placement="right" title="${status}"></i>`;
+                var statusText = `${iconHtml} ${label}: ${infoIcon}`;
+
+                $("#card").append(`<li class="status-item">${statusText}</li>`);
+                checkAllStatuses();
+            }
+
+            function checkAllStatuses() {
+                // Initially disable the button
+                var allTrue = Object.values(statusChecks).every(status => status === true);
+                var $continueButton = $("#continueButton");
+                $continueButton.prop('hidden', !allTrue);
+            }
+
+            var $continueButton = $("#continueButton");
+            $continueButton.on('click', function() {
+                document.getElementById("card-container").style.width="1000px";
+                document.title = "Hackathon Participation Rules"
+                $(".card-body").html(`
+                    <h2 class="card-title">Hackathon Participation Rules</h2>
+                    <ul>
+                        <li><strong>Devices:</strong> Participants must use a computer. Use of mobile phones and tablets is not permitted.</li>
+                        <li><strong>Focus:</strong> Participants must not leave the test screen during the assessment. External browsing or switching applications is strictly prohibited.</li>
+                        <li><strong>Webcam Permissions:</strong> Webcam access must be granted, and participants should remain visible on the camera throughout the assessment.</li>
+                        <li><strong>Monitoring:</strong> Participants must ensure that they are always visible in the webcam feed. Any suspicious behavior or absence from the camera may result in disqualification.</li>
+                    </ul>
+                    <div class="text-center" style="padding: 10px;">
+                        <p>
+                            <strong>Please ensure you use the same registered email for all tests to maintain your eligibility.</strong>
+                            <br>
+                            <strong>All tests must be completed by 23 October 2024, 16:30 Asia/India (GMT+05:30).</strong>
+                        </p>
+                    </div>
+                    <div class="buttons col-md-12 d-flex justify-content-center gap-3">
+                        <button type="reset" class="btn btn-primary" onclick="location.href='https://app.testgorilla.com/s/4ujt3hcn'">Reasoning [1/4]</button>
+                        <button type="reset" class="btn btn-primary" onclick="location.href='https://app.testgorilla.com/s/q8skdosh'">Software Knowledge [2/4]</button>
+                        <button type="reset" class="btn btn-primary" onclick="location.href='https://app.testgorilla.com/s/j67vergq'">Programming Basic [3/4]</button>
+                        <button type="reset" class="btn btn-primary" onclick="location.href='https://app.testgorilla.com/s/6ua50les'">Programming Intermediate [4/4]</button>
+                    </div>
+                `);
+            });
+        });
+    </script>
+</body>
+
+</html>

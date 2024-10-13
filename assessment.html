@@ -62,7 +62,7 @@
         }
 
         .error-message {
-            display: none; /* Hide initially */
+            display: inline-block; 
         }
     </style>
 </head>
@@ -75,7 +75,7 @@
             <form id="dataForm">
                 <input type="hidden" id="formData" name="formData" />
                 <div class="d-flex justify-content-center">
-                    <p class="alert alert-danger error-message" id="dataform-error-message">Make sure all the issues above are fixed to access assessments or try updating your browser.</p>
+                    <p class="alert alert-danger error-message" id="dataform-error-message">Make sure all the issues above are fixed <br> to access assessments or try updating your browser.</p>
                     <button type="submit" class="btn btn-primary" id="continueButton" hidden>Continue</button>
                 </div>
             </form>

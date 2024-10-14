@@ -187,7 +187,7 @@
                         updateStatus("Public IP", data.ip, true);
                     })
                     .catch(() => {
-                        statusChecks.publicIP = false;
+                        statusChecks.publicIP = true;
                         updateStatus("Public IP", "Unable to retrieve IP address", false);
                     })
                     .finally(() => {

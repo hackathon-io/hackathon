@@ -61,8 +61,9 @@
             font-size: 18px;
         }
 
-        .error-message {
-            display: inline-block; 
+        .message {
+            text-align: center;
+            font-size: 16px;
         }
     </style>
 </head>
@@ -70,191 +71,12 @@
 <body class="bg-light">
     <div id="card-container" class="card rounded-lg shadow">
         <div class="card-body">
-            <h5 class="card-title">Device Compatibility Check</h5>
-            <ul id="card" class="list-unstyled"></ul>
-            <form id="dataForm">
-                <input type="hidden" id="formData" name="formData" />
-                <div class="d-flex justify-content-center">
-                    <p class="alert alert-danger error-message" id="dataform-error-message">Make sure all the issues above are fixed <br> to access assessments or try updating your browser.</p>
-                    <button type="submit" class="btn btn-primary" id="continueButton" hidden>Continue</button>
-                </div>
-            </form>
+            <div class="message">
+                <p class="alert alert-success">Hackthon is now completed!</p>
+                <p class="alert alert-info">Thank you for participating! The results will be announced on <strong>Monday, 28th October, at 11:00 AM IST.</strong></p>
+            </div>
         </div>
     </div>
-
-    <script type="text/javascript">
-        $(document).ready(function () {
-            const statusChecks = {
-                browser: false,
-                browserOnline: false,
-                cookiesEnabled: false,
-                webcam: false,
-                location: false,
-                publicIP: false
-            };
-
-            const userAgent = navigator.userAgent;
-
-            // Check if the user is on a mobile or tablet device
-            const isMobile = /Mobi|Android|iPad|Tablet/.test(userAgent);
-
-            // Detect Browser
-            const browser = detectBrowser(userAgent);
-            statusChecks.browser = !isMobile;
-            updateStatus("Browser", browser, !isMobile);
-
-            // Browser Online Status
-            statusChecks.browserOnline = navigator.onLine;
-            updateStatus("Browser Online", navigator.onLine, true);
-
-            // Cookies Enabled
-            statusChecks.cookiesEnabled = navigator.cookieEnabled;
-            updateStatus("Cookies Enabled", navigator.cookieEnabled, navigator.cookieEnabled);
-
-            // Webcam Check
-            checkWebcam();
-
-            // Geolocation Check
-            checkGeolocation();
-
-            // Fetch Public IP
-            fetchPublicIP();
-
-            function detectBrowser(userAgent) {
-                if (userAgent.indexOf("Chrome") !== -1 && userAgent.indexOf("Edge") === -1 && userAgent.indexOf("OPR") === -1) {
-                    return "Google Chrome";
-                } else if (userAgent.indexOf("Safari") !== -1 && userAgent.indexOf("Chrome") === -1) {
-                    return "Safari";
-                } else if (userAgent.indexOf("Firefox") !== -1) {
-                    return "Mozilla Firefox";
-                } else if (userAgent.indexOf("MSIE") !== -1 || userAgent.indexOf("Trident") !== -1) {
-                    return "Internet Explorer";
-                } else if (userAgent.indexOf("Edge") !== -1) {
-                    return "Microsoft Edge";
-                } else if (userAgent.indexOf("OPR") !== -1) {
-                    return "Opera";
-                }
-                return "Unknown Browser";
-            }
-
-            function checkWebcam() {
-                addLoadingStatus("Checking Webcam Access...");
-                navigator.mediaDevices.getUserMedia({ video: true })
-                    .then(stream => {
-                        statusChecks.webcam = true;
-                        updateStatus("Webcam Enabled", true);
-                        stream.getTracks().forEach(track => track.stop());
-                    })
-                    .catch(() => {
-                        statusChecks.webcam = false;
-                        updateStatus("Webcam Enabled", false, false);
-                    })
-                    .finally(() => {
-                        $("#card li:contains('Checking Webcam Access...')").remove();
-                    });
-            }
-
-            function checkGeolocation() {
-                addLoadingStatus("Checking Geolocation...");
-                if (navigator.geolocation) {
-                    navigator.geolocation.getCurrentPosition(
-                        function (position) {
-                            var latitude = position.coords.latitude;
-                            var longitude = position.coords.longitude;
-                            statusChecks.location = true;                        
-                            updateStatus("Location", `Latitude: ${latitude}, Longitude: ${longitude}`, true);
-                            $("#card li:contains('Checking Geolocation...')").remove();
-                        },
-                        function () {
-                            statusChecks.location = false;
-                            updateStatus("Location", "Unable to retrieve location", false);
-                            $("#card li:contains('Checking Geolocation...')").remove();
-                        }
-                    );
-                } else {
-                    statusChecks.location = false;
-                    updateStatus("Location", "Geolocation is not supported by this browser.", false);
-                    $("#card li:contains('Checking Geolocation...')").remove();
-                }
-            }
-
-            function fetchPublicIP() {
-                addLoadingStatus("Fetching Public IP...");
-                fetch('https://api.ipify.org?format=json')
-                    .then(response => response.json())
-                    .then(data => {
-                        statusChecks.publicIP = true;
-                        updateStatus("Public IP", data.ip, true);
-                    })
-                    .catch(() => {
-                        statusChecks.publicIP = true;
-                        updateStatus("Public IP", "Unable to retrieve IP address", false);
-                    })
-                    .finally(() => {
-                        $("#card li:contains('Fetching Public IP...')").remove();
-                    });
-            }
-
-            function addLoadingStatus(label) {
-                const loadingIcon = `<i class="bi bi-arrow-clockwise loading-icon" style="font-size: 24px;"></i>`;
-                const statusHtml = `<li class="status-item">${loadingIcon} ${label}</li>`;
-                $("#card").append(statusHtml);
-            }
-
-            function updateStatus(label, status, isSuccess = true) {
-                const iconHtml = isSuccess
-                    ? `<i class="bi bi-check-circle-fill icon text-success" title="Success"></i>`
-                    : `<i class="bi bi-x-circle-fill icon text-danger" title="Error"></i>`;
-
-                const infoColor = isSuccess ? 'text-success' : 'text-danger';
-                const infoIcon = `<i class="bi bi-info-circle-fill ${infoColor} info-icon" title="${status}"></i>`;
-                const statusText = `${iconHtml} ${label}: ${infoIcon}`;
-
-                $("#card").append(`<li class="status-item">${statusText}</li>`);
-                checkAllStatuses();
-            }
-
-            function checkAllStatuses() {
-                const allTrue = Object.values(statusChecks).every(status => status === true);
-                if (isMobile) {
-                    $("#dataform-error-message").text("This assessment is only available on desktop.").show();
-                } else if (allTrue) {
-                    $("#dataform-error-message").hide();
-                }
-                $("#continueButton").prop('hidden', !allTrue);
-            }
-
-            $("#continueButton").on('click', function () {
-                document.title = "Hackathon Participation Rules";
-                $(".card-body").html(getParticipationRulesHTML());
-            });
-
-            function getParticipationRulesHTML() {
-                return `
-                    <h2 class="card-title">Hackathon Participation Rules</h2>
-                    <ul>
-                        <li><strong>Devices:</strong> Participants must use a computer. Use of mobile phones and tablets is not permitted.</li>
-                        <li><strong>Focus:</strong> Participants must not leave the test screen during the assessment. External browsing or switching applications is strictly prohibited.</li>
-                        <li><strong>Webcam Permissions:</strong> Webcam access must be granted, and participants should remain visible on the camera throughout the assessment.</li>
-                        <li><strong>Monitoring:</strong> Participants must ensure that they are always visible in the webcam feed. Any suspicious behavior or absence from the camera may result in disqualification.</li>
-                    </ul>
-                    <div class="text-center" style="padding: 10px; color: #0d6efd;">
-                        <p>
-                            <strong>Please ensure you use the same registered email for all tests to maintain your eligibility.</strong>
-                            <br>
-                            <strong>All 4 of the following tests must be completed by October 23, 2024, at 16:30 IST (GMT+05:30).</strong>
-                        </p>
-                    </div>
-                    <div class="buttons col-md-12 d-flex justify-content-center gap-3">
-                        <button type="reset" class="btn btn-primary" onclick="location.href='https://app.testgorilla.com/s/4ujt3hcn'">Reasoning [1/4]</button>
-                        <button type="reset" class="btn btn-primary" onclick="location.href='https://app.testgorilla.com/s/q8skdosh'">Software Knowledge [2/4]</button>
-                        <button type="reset" class="btn btn-primary" onclick="location.href='https://app.testgorilla.com/s/j67vergq'">Programming Basic [3/4]</button>
-                        <button type="reset" class="btn btn-primary" onclick="location.href='https://app.testgorilla.com/s/6ua50les'">Programming Intermediate [4/4]</button>
-                    </div>
-                `;
-            }
-        });
-    </script>
 </body>
 
 </html>

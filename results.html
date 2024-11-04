@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Sortable, Searchable, and Paginated Test Results Table</title>
+    <title>Hackathon 2024 - Results</title>
     <!-- Include Bootstrap CSS -->
     <!-- <link href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css" rel="stylesheet"> -->
     <link href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap/5.3.3/css/bootstrap.min.css" rel="stylesheet">
@@ -210,7 +210,10 @@
             paginationItem: 'page-item', // Use custom pagination item class
             paginationLink: 'page-link' // Use custom pagination link class
         };
-        new List('resultsList', options);
+        var myList = new List('resultsList', options);
+        myList.sort("rank", {
+            order: "asc"
+        })
     }
 
     // Fetch data on page load

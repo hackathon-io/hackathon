@@ -136,6 +136,17 @@
         <div class="search-box">
             <input type="text" class="fuzzy-search" placeholder="Search by Name..." />
         </div>
+        <div id="controls">
+            <label for="rowsToShow">Show rows:</label>
+            <select id="rowsToShow">
+                <option value="5">5</option>
+                <option value="10">10</option>
+                <option value="15">15</option>
+                <option value="20">20</option>
+                <option value="50">50</option>
+                <option value="100">100</option>
+            </select>
+        </div>
         <table class="table-bordered">
             <thead>
                 <tr>
@@ -214,7 +225,15 @@
         myList.sort("rank", {
             order: "asc"
         })
+
+        // Event listener to change the number of rows shown
+        document.getElementById('rowsToShow').addEventListener('change', function() {
+            var selectedValue = parseInt(this.value, 10);
+            myList.page = selectedValue; // Set the number of rows per page
+            myList.update(); // Update the list to reflect the change
+        });
     }
+
 
     // Fetch data on page load
     window.onload = fetchData;
